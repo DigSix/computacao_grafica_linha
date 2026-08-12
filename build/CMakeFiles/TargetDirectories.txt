@@ -1,0 +1,3 @@
+/home/digsix/Univali/2026.2/computacao_grafica/cubo/build/CMakeFiles/Linha.dir
+/home/digsix/Univali/2026.2/computacao_grafica/cubo/build/CMakeFiles/edit_cache.dir
+/home/digsix/Univali/2026.2/computacao_grafica/cubo/build/CMakeFiles/rebuild_cache.dir

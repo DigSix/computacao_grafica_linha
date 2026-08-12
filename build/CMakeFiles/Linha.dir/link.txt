@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/Linha.dir/link.d CMakeFiles/Linha.dir/src/main.cpp.o -o Linha  /usr/lib/libGLU.so /usr/lib/libglut.so /usr/lib/libGLX.so /usr/lib/libOpenGL.so /usr/lib/libXmu.so /usr/lib/libXi.so
