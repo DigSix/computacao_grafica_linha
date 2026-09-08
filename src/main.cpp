@@ -3,7 +3,13 @@
 #include <GL/freeglut.h>
 #include <vector>
 
-using vertice = std::pair<double, double>;
+struct Vec3{
+	double x;
+	double y;
+	double z;
+};
+
+using vertice = Vec3;
 using lista_vertices = std::vector<vertice>;
 using aresta = std::pair<int, int>;
 using lista_arestas = std::vector<aresta>;
@@ -11,9 +17,11 @@ using lista_arestas = std::vector<aresta>;
 struct Poligono {
 	double tamanhoLado;
 	int numLados;
-	vertice posicao;
-	std::pair<double, double> escala;
+
+	Vec3 posicao;
+	Vec3 escala;
 	double rotacao;
+
 	lista_vertices vertices;
 	lista_arestas arestas;
 };
@@ -21,6 +29,7 @@ struct Poligono {
 Poligono criar_poligono(
 	double posicao_x,
 	double posicao_y,
+	double posicao_z,
 	double tamanho_lado,
 	int num_lados
 );
@@ -38,13 +47,13 @@ void redraw(int value);
 void keyboard(unsigned char key, int x, int y);
 void keyboard_special(int key, int x, int y);
 
-Poligono pentagono;
+Poligono cubo;
 float velocidadeRotacao = 0;
 int delay = 10;
 
 int main(int argc, char** argv) {
 
-	pentagono = criar_poligono(128, 128, 50, 7);
+	cubo = criar_poligono(128, 128, 128, 50, 4);
 
 	glutInit(&argc, argv);
 
@@ -53,7 +62,8 @@ int main(int argc, char** argv) {
 	glutCreateWindow("Desenhando um Polígono");
 
 	glClearColor(1, 1, 1, 0);
-	glOrtho(0, 255, 0, 255, -1, 1);
+
+	glEnable(GL_DEPTH_TEST);
 
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
@@ -69,12 +79,37 @@ double tangente(double angulo) {
 	return sin(angulo) / cos(angulo);
 }
 
+void configurar_camera() {
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    gluPerspective(
+        60.0,    // campo de visão
+        512.0 / 512.0, // aspect ratio
+        0.1,     // plano próximo
+        1000.0   // plano distante
+    );
+
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Câmera olhando para o centro do cubo
+    gluLookAt(
+        300, 300, 300,   // posição da câmera
+        128, 128, 103,   // ponto para onde olha
+        0, 1, 0          // "cima"
+    );
+}
+
 void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT);
 
-	desenhar(pentagono);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glFlush();
+    configurar_camera();
+
+    desenhar(cubo);
+
+    glFlush();
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -87,11 +122,11 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 
 	case 'o':
-		escalar(pentagono, 0.9, 0.9);
+		escalar(cubo, 0.9, 0.9);
 		break;
 
 	case 'p':
-		escalar(pentagono, 1.1, 1.1);
+		escalar(cubo, 1.1, 1.1);
 		break;
 
 	case 'k':
@@ -111,7 +146,7 @@ void keyboard_special(int key, int x, int y) {
 
 	case GLUT_KEY_DOWN:
 		movimentar(
-			pentagono,
+			cubo,
 			10,
 			(270 / 180.0) * 3.1416
 		);
@@ -119,7 +154,7 @@ void keyboard_special(int key, int x, int y) {
 
 	case GLUT_KEY_UP:
 		movimentar(
-			pentagono,
+			cubo,
 			10,
 			(90 / 180.0) * 3.1416
 		);
@@ -127,7 +162,7 @@ void keyboard_special(int key, int x, int y) {
 
 	case GLUT_KEY_RIGHT:
 		movimentar(
-			pentagono,
+			cubo,
 			10,
 			(0 / 180.0) * 3.1416
 		);
@@ -135,7 +170,7 @@ void keyboard_special(int key, int x, int y) {
 
 	case GLUT_KEY_LEFT:
 		movimentar(
-			pentagono,
+			cubo,
 			10,
 			(180 / 180.0) * 3.1416
 		);
@@ -144,7 +179,7 @@ void keyboard_special(int key, int x, int y) {
 }
 
 void redraw(int value) {
-	rotacionar(pentagono, velocidadeRotacao);
+	rotacionar(cubo, velocidadeRotacao);
 
 	glutPostRedisplay();
 	glutTimerFunc(delay, redraw, 0);
@@ -153,6 +188,7 @@ void redraw(int value) {
 Poligono criar_poligono(
 	double posicao_x,
 	double posicao_y,
+	double posicao_z,
 	double tamanho_lado,
 	int num_lados
 ) {
@@ -160,13 +196,15 @@ Poligono criar_poligono(
 
 	novo_poligono.numLados = num_lados;
 
-	novo_poligono.posicao.first = posicao_x;
-	novo_poligono.posicao.second = posicao_y;
+	novo_poligono.posicao.x = posicao_x;
+	novo_poligono.posicao.y = posicao_y;
+	novo_poligono.posicao.z = posicao_z;
 
 	novo_poligono.tamanhoLado = tamanho_lado;
 
-	novo_poligono.escala.first = 1;
-	novo_poligono.escala.second = 1;
+	novo_poligono.escala.x = 1;
+	novo_poligono.escala.y = 1;
+	novo_poligono.escala.z = 1;
 
 	novo_poligono.rotacao = 0;
 
@@ -185,17 +223,13 @@ Poligono criar_poligono(
 	posicao_y -= apothem;
 
 	novo_poligono.vertices.push_back(
-		vertice(posicao_x, posicao_y)
+			vertice(posicao_x, posicao_y, posicao_z)
+		);
+	novo_poligono.vertices.push_back(
+			vertice(posicao_x, posicao_y, posicao_z - tamanho_lado)
 	);
 
-	std::cout << "Vertices:\n";
-
-	std::cout << 0
-			  << " - "
-			  << posicao_x
-			  << " - "
-			  << posicao_y
-			  << "\n";
+	// Vertices
 
 	for (int i = 1; i < num_lados; i++) {
 
@@ -208,31 +242,35 @@ Poligono criar_poligono(
 			tamanho_lado * sin(angulo);
 
 		novo_poligono.vertices.push_back(
-			vertice(posicao_x, posicao_y)
+			vertice(posicao_x, posicao_y, posicao_z)
 		);
-
-		std::cout << i
-				  << " - "
-				  << posicao_x
-				  << " - "
-				  << posicao_y
-				  << "\n";
+		novo_poligono.vertices.push_back(
+			vertice(posicao_x, posicao_y, posicao_z - tamanho_lado)
+		);
 
 		angulo += passo_angulo;
 	}
 
-	std::cout << "Arestas:\n";
+	// Arestas
 
 	for (int i = 0; i < num_lados; i++) {
+		int atual = i * 2;
+		int proximo = ((i + 1) % num_lados) * 2;
 
+		// Aresta da frente
 		novo_poligono.arestas.push_back(
-			aresta(i, (i + 1) % num_lados)
+			aresta(atual, proximo)
 		);
 
-		std::cout << i
-				  << " - "
-				  << (i + 1) % num_lados
-				  << "\n";
+		// Aresta de trás
+		novo_poligono.arestas.push_back(
+			aresta(atual + 1, proximo + 1)
+		);
+
+		// Aresta lateral
+		novo_poligono.arestas.push_back(
+			aresta(atual, atual + 1)
+		);
 	}
 
 	return novo_poligono;
@@ -243,22 +281,22 @@ void movimentar(
 	double distancia,
 	double angulo
 ) {
-	poligono.posicao.first =
-		poligono.posicao.first +
+	poligono.posicao.x =
+		poligono.posicao.x +
 		distancia * cos(angulo);
 
-	poligono.posicao.second =
-		poligono.posicao.second +
+	poligono.posicao.y =
+		poligono.posicao.y +
 		distancia * sin(angulo);
 
-	for (int i = 0; i < poligono.numLados; i++) {
+	for (int i = 0; i < poligono.vertices.size(); i++) {
 
-		poligono.vertices[i].first =
-			poligono.vertices[i].first +
+		poligono.vertices[i].x =
+			poligono.vertices[i].x +
 			distancia * cos(angulo);
 
-		poligono.vertices[i].second =
-			poligono.vertices[i].second +
+		poligono.vertices[i].y =
+			poligono.vertices[i].y +
 			distancia * sin(angulo);
 	}
 }
@@ -268,28 +306,28 @@ void escalar(
 	double escala_x,
 	double escala_y
 ) {
-	poligono.escala.first *= escala_x;
-	poligono.escala.second *= escala_y;
+	poligono.escala.x *= escala_x;
+	poligono.escala.y *= escala_y;
 
-	for (int i = 0; i < poligono.numLados; i++) {
+	for (int i = 0; i < poligono.vertices.size(); i++) {
 
 		// Translada para a origem
-		poligono.vertices[i].first -=
-			poligono.posicao.first;
+		poligono.vertices[i].x -=
+			poligono.posicao.x;
 
-		poligono.vertices[i].second -=
-			poligono.posicao.second;
+		poligono.vertices[i].y -=
+			poligono.posicao.y;
 
 		// Aplica escala
-		poligono.vertices[i].first *= escala_x;
-		poligono.vertices[i].second *= escala_y;
+		poligono.vertices[i].x *= escala_x;
+		poligono.vertices[i].y *= escala_y;
 
 		// Volta para a posição original
-		poligono.vertices[i].first +=
-			poligono.posicao.first;
+		poligono.vertices[i].x +=
+			poligono.posicao.x;
 
-		poligono.vertices[i].second +=
-			poligono.posicao.second;
+		poligono.vertices[i].y +=
+			poligono.posicao.y;
 	}
 }
 
@@ -300,33 +338,33 @@ void rotacionar(
 	poligono.rotacao += angulo;
 
 	for (int i = 0;
-		 i < poligono.arestas.size();
+		 i < poligono.vertices.size();
 		 i++) {
 
 		// Translada o vértice para a origem
-		poligono.vertices[i].first -=
-			poligono.posicao.first;
+		poligono.vertices[i].x -=
+			poligono.posicao.x;
 
-		poligono.vertices[i].second -=
-			poligono.posicao.second;
+		poligono.vertices[i].y -=
+			poligono.posicao.y;
 
 		double novoX =
-			poligono.vertices[i].first * cos(angulo) -
-			poligono.vertices[i].second * sin(angulo);
+			poligono.vertices[i].x * cos(angulo) -
+			poligono.vertices[i].y * sin(angulo);
 
 		double novoY =
-			poligono.vertices[i].first * sin(angulo) +
-			poligono.vertices[i].second * cos(angulo);
+			poligono.vertices[i].x * sin(angulo) +
+			poligono.vertices[i].y * cos(angulo);
 
-		poligono.vertices[i].first = novoX;
-		poligono.vertices[i].second = novoY;
+		poligono.vertices[i].x = novoX;
+		poligono.vertices[i].y = novoY;
 
 		// Volta para a posição original
-		poligono.vertices[i].first +=
-			poligono.posicao.first;
+		poligono.vertices[i].x +=
+			poligono.posicao.x;
 
-		poligono.vertices[i].second +=
-			poligono.posicao.second;
+		poligono.vertices[i].y +=
+			poligono.posicao.y;
 	}
 }
 
@@ -343,14 +381,16 @@ void desenhar(Poligono poligono) {
 		int v_o = poligono.arestas[i].first;
 		int v_d = poligono.arestas[i].second;
 
-		glVertex2f(
-			poligono.vertices[v_o].first,
-			poligono.vertices[v_o].second
+		glVertex3f(
+			poligono.vertices[v_o].x,
+			poligono.vertices[v_o].y,
+			poligono.vertices[v_o].z
 		);
 
-		glVertex2f(
-			poligono.vertices[v_d].first,
-			poligono.vertices[v_d].second
+		glVertex3f(
+			poligono.vertices[v_d].x,
+			poligono.vertices[v_d].y,
+			poligono.vertices[v_d].z
 		);
 	}
 
