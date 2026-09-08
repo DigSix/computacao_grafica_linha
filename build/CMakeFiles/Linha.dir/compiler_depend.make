@@ -149,12 +149,15 @@ CMakeFiles/Linha.dir/src/main.cpp.o: /home/digsix/Univali/2026.2/computacao_graf
   /usr/include/c++/16/bits/stdexcept_throw.h \
   /usr/include/c++/16/bits/stdexcept_throwfwd.h \
   /usr/include/c++/16/bits/stl_algobase.h \
+  /usr/include/c++/16/bits/stl_bvector.h \
   /usr/include/c++/16/bits/stl_construct.h \
   /usr/include/c++/16/bits/stl_function.h \
   /usr/include/c++/16/bits/stl_iterator.h \
   /usr/include/c++/16/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/16/bits/stl_iterator_base_types.h \
   /usr/include/c++/16/bits/stl_pair.h \
+  /usr/include/c++/16/bits/stl_uninitialized.h \
+  /usr/include/c++/16/bits/stl_vector.h \
   /usr/include/c++/16/bits/streambuf.tcc \
   /usr/include/c++/16/bits/streambuf_iterator.h \
   /usr/include/c++/16/bits/string_view.tcc \
@@ -162,6 +165,7 @@ CMakeFiles/Linha.dir/src/main.cpp.o: /home/digsix/Univali/2026.2/computacao_graf
   /usr/include/c++/16/bits/uses_allocator.h \
   /usr/include/c++/16/bits/uses_allocator_args.h \
   /usr/include/c++/16/bits/utility.h \
+  /usr/include/c++/16/bits/vector.tcc \
   /usr/include/c++/16/bits/version.h \
   /usr/include/c++/16/cctype \
   /usr/include/c++/16/cerrno \
@@ -213,6 +217,7 @@ CMakeFiles/Linha.dir/src/main.cpp.o: /home/digsix/Univali/2026.2/computacao_graf
   /usr/include/c++/16/tuple \
   /usr/include/c++/16/type_traits \
   /usr/include/c++/16/typeinfo \
+  /usr/include/c++/16/vector \
   /usr/include/c++/16/x86_64-pc-linux-gnu/bits/atomic_word.h \
   /usr/include/c++/16/x86_64-pc-linux-gnu/bits/c++allocator.h \
   /usr/include/c++/16/x86_64-pc-linux-gnu/bits/c++config.h \
@@ -263,11 +268,11 @@ Linha: /usr/lib/Scrt1.o \
   /usr/lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtbeginS.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc_s.so \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so \
   /usr/lib/ld-linux-x86-64.so.2 \
   /usr/lib/libGLU.so \
   /usr/lib/libGLX.so \
@@ -290,7 +295,6 @@ Linha: /usr/lib/Scrt1.o \
   /usr/lib/libglut.so \
   /usr/lib/libm.so.6 \
   /usr/lib/libmvec.so.1 \
-  /usr/lib/libstdc++.so.6 \
   /usr/lib/libuuid.so.1 \
   /usr/lib/libxcb.so.1 \
   /usr/lib32/libGLdispatch.so.0 \
@@ -304,7 +308,6 @@ Linha: /usr/lib/Scrt1.o \
   /usr/lib32/libXrender.so.1 \
   /usr/lib32/libXt.so.6 \
   /usr/lib32/libXxf86vm.so.1 \
-  /usr/lib32/libstdc++.so.6 \
   /usr/lib32/libuuid.so.1 \
   /usr/lib32/libxcb.so.1 \
   CMakeFiles/Linha.dir/src/main.cpp.o
@@ -313,8 +316,6 @@ Linha: /usr/lib/Scrt1.o \
 CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib32/libxcb.so.1:
-
-/usr/lib32/libstdc++.so.6:
 
 /usr/lib32/libXt.so.6:
 
@@ -329,8 +330,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/lib32/libGLdispatch.so.0:
 
 /usr/lib/libuuid.so.1:
-
-/usr/lib/libstdc++.so.6:
 
 /usr/lib/libm.so.6:
 
@@ -370,15 +369,17 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib/ld-linux-x86-64.so.2:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.a:
-
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a:
 
 /usr/lib/libm.so:
 
 /usr/lib/libgcc_s.so.1:
+
+/usr/lib/crti.o:
+
+/usr/lib/Scrt1.o:
+
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdint.h:
 
 /usr/include/c++/16/bits/move.h:
 
@@ -514,6 +515,8 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/bits/types/__fpos64_t.h:
 
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so:
+
 /usr/include/bits/flt-eval-method.h:
 
 /usr/include/bits/types.h:
@@ -536,8 +539,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/bits/typesizes.h:
 
-/usr/lib/crti.o:
-
 /usr/include/bits/cpu-set.h:
 
 /usr/include/KHR/khrplatform.h:
@@ -558,6 +559,8 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib/libGLU.so:
 
+/usr/include/c++/16/bits/vector.tcc:
+
 /usr/include/bits/floatn.h:
 
 /home/digsix/Univali/2026.2/computacao_grafica/cubo/src/main.cpp:
@@ -568,13 +571,13 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/asm-generic/int-ll64.h:
 
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.so:
+
 /usr/include/bits/mathcalls-macros.h:
 
 /usr/include/c++/16/bits/locale_classes.tcc:
 
 /usr/include/bits/fp-logb.h:
-
-/usr/include/asm-generic/errno.h:
 
 /usr/include/bits/libc-header-start.h:
 
@@ -650,8 +653,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/c++/16/x86_64-pc-linux-gnu/bits/c++config.h:
 
-/usr/lib/Scrt1.o:
-
 /usr/include/bits/mathcalls-narrow.h:
 
 /usr/include/bits/pthread_stack_min-dynamic.h:
@@ -663,6 +664,10 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/include/c++/16/cctype:
 
 /usr/include/wchar.h:
+
+/usr/lib/libc.so:
+
+/usr/include/bits/pthreadtypes.h:
 
 /usr/lib32/libXrender.so.1:
 
@@ -732,6 +737,10 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/stdint.h:
 
+/usr/include/asm-generic/posix_types.h:
+
+/usr/include/c++/16/bits/uses_allocator.h:
+
 /usr/include/c++/16/bits/stl_function.h:
 
 /usr/include/c++/16/ext/numeric_traits.h:
@@ -744,6 +753,16 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/c++/16/bits/stl_iterator_base_types.h:
 
+/usr/include/c++/16/bits/stl_uninitialized.h:
+
+/usr/include/c++/16/bits/string_view.tcc:
+
+/usr/include/asm-generic/errno.h:
+
+/usr/include/c++/16/bits/stl_vector.h:
+
+/usr/include/locale.h:
+
 /usr/include/c++/16/bits/streambuf.tcc:
 
 /usr/include/bits/types/__sigset_t.h:
@@ -751,12 +770,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/include/c++/16/iosfwd:
 
 /usr/include/c++/16/bits/streambuf_iterator.h:
-
-/usr/include/c++/16/bits/string_view.tcc:
-
-/usr/include/asm-generic/posix_types.h:
-
-/usr/include/c++/16/bits/uses_allocator.h:
 
 /usr/include/c++/16/bits/version.h:
 
@@ -795,6 +808,8 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/include/asm-generic/bitsperlong.h:
 
 /usr/include/asm-generic/types.h:
+
+/usr/include/c++/16/bits/stl_bvector.h:
 
 /usr/include/c++/16/debug/debug.h:
 
@@ -872,6 +887,8 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/c++/16/typeinfo:
 
+/usr/include/c++/16/vector:
+
 /usr/include/c++/16/x86_64-pc-linux-gnu/bits/atomic_word.h:
 
 /usr/include/GL/freeglut.h:
@@ -900,8 +917,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/include/linux/sched/types.h:
 
-/usr/include/locale.h:
-
 /usr/include/math.h:
 
 /usr/include/c++/16/compare:
@@ -915,9 +930,3 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/include/sys/single_threaded.h:
 
 /usr/include/time.h:
-
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/include/stdint.h:
-
-/usr/include/bits/pthreadtypes.h:
-
-/usr/lib/libc.so:

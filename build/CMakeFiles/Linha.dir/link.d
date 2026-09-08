@@ -9,7 +9,7 @@ Linha: \
   /usr/lib/libOpenGL.so \
   /usr/lib/libXmu.so \
   /usr/lib/libXi.so \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so \
@@ -24,7 +24,7 @@ Linha: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so \
-  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a \
+  /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libc.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libc.so \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libc.so \
@@ -39,8 +39,6 @@ Linha: \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/libgcc.a \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/crtendS.o \
   /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o \
-  /usr/lib32/libstdc++.so.6 \
-  /usr/lib/libstdc++.so.6 \
   /usr/lib32/libX11.so.6 \
   /usr/lib/libX11.so.6 \
   /usr/lib32/libXrandr.so.2 \
@@ -53,6 +51,7 @@ Linha: \
   /usr/lib/libXt.so.6 \
   /usr/lib32/libXext.so.6 \
   /usr/lib/libXext.so.6 \
+  /usr/lib/ld-linux-x86-64.so.2 \
   /usr/lib32/libxcb.so.1 \
   /usr/lib/libxcb.so.1 \
   /usr/lib32/libXrender.so.1 \
@@ -88,7 +87,7 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib/libXi.so:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.a:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libstdc++.so:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libm.so:
 
@@ -118,7 +117,7 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic_asneeded.so:
 
-/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.a:
+/usr/lib/gcc/x86_64-pc-linux-gnu/16/libatomic.so:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/libc.so:
 
@@ -148,10 +147,6 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 
 /usr/lib/gcc/x86_64-pc-linux-gnu/16/../../../../lib/crtn.o:
 
-/usr/lib32/libstdc++.so.6:
-
-/usr/lib/libstdc++.so.6:
-
 /usr/lib32/libX11.so.6:
 
 /usr/lib/libX11.so.6:
@@ -175,6 +170,8 @@ CMakeFiles/Linha.dir/src/main.cpp.o:
 /usr/lib32/libXext.so.6:
 
 /usr/lib/libXext.so.6:
+
+/usr/lib/ld-linux-x86-64.so.2:
 
 /usr/lib32/libxcb.so.1:
 
