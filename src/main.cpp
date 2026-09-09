@@ -9,21 +9,21 @@ struct Vec3{
 	double z;
 };
 
-using vertice = Vec3;
+using vertice =        Vec3;
 using lista_vertices = std::vector<vertice>;
-using aresta = std::pair<int, int>;
-using lista_arestas = std::vector<aresta>;
+using aresta =         std::pair<int, int>;
+using lista_arestas =  std::vector<aresta>;
 
 struct Poligono {
 	double tamanhoLado;
-	int numLados;
+	int	   numLados;
 
 	Vec3 posicao;
 	Vec3 escala;
-	double rotacao;
+	Vec3 rotacao;
 
 	lista_vertices vertices;
-	lista_arestas arestas;
+	lista_arestas  arestas;
 };
 
 Poligono criar_poligono(
@@ -31,13 +31,16 @@ Poligono criar_poligono(
 	double posicao_y,
 	double posicao_z,
 	double tamanho_lado,
-	int num_lados
+	int    num_lados
 );
 
 void desenhar(Poligono poligono);
-void movimentar(Poligono& poligono, double distancia, double angulo);
-void escalar(Poligono& poligono, double escala_x, double escala_y);
-void rotacionar(Poligono& poligono, double angulo);
+void movimentar_xy(Poligono& poligono, double distancia, double angulo);
+void movimentar_xz(Poligono& poligono, double distancia, double angulo);
+void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
+void rotacionar_x(Poligono& poligono, double angulo);
+void rotacionar_y(Poligono& poligono, double angulo);
+void rotacionar_z(Poligono& poligono, double angulo);
 
 // Implementação da tangente
 double tangente(double angulo);
@@ -48,12 +51,15 @@ void keyboard(unsigned char key, int x, int y);
 void keyboard_special(int key, int x, int y);
 
 Poligono cubo;
-float velocidadeRotacao = 0;
-int delay = 10;
+float    velocidadeRotacao = 0;
+bool     rotacionando_x = false;
+bool     rotacionando_y = false;
+bool     rotacionando_z = false;
+int      delay = 10;
 
 int main(int argc, char** argv) {
 
-	cubo = criar_poligono(128, 128, 128, 50, 4);
+	cubo = criar_poligono(128, 128, 128, 100, 4);
 
 	glutInit(&argc, argv);
 
@@ -113,8 +119,6 @@ void display(void) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-	std::cout << key;
-
 	switch (key) {
 
 	case 27:
@@ -122,11 +126,11 @@ void keyboard(unsigned char key, int x, int y) {
 		break;
 
 	case 'o':
-		escalar(cubo, 0.9, 0.9);
+		escalar(cubo, 0.9, 0.9, 0.9);
 		break;
 
 	case 'p':
-		escalar(cubo, 1.1, 1.1);
+		escalar(cubo, 1.1, 1.1, 1.1);
 		break;
 
 	case 'k':
@@ -136,40 +140,46 @@ void keyboard(unsigned char key, int x, int y) {
 	case 'l':
 		velocidadeRotacao += 0.01;
 		break;
-	}
-}
 
-void keyboard_special(int key, int x, int y) {
-	std::cout << key;
 
-	switch (key) {
+	case 'x':
+		rotacionando_x = !rotacionando_x;
+		break;
 
-	case GLUT_KEY_DOWN:
-		movimentar(
+	case 'y':
+		rotacionando_y = !rotacionando_y;
+		break;
+
+	case 'z':
+		rotacionando_z = !rotacionando_z;
+		break;
+
+	case 'w':
+		movimentar_xz(
 			cubo,
 			10,
 			(270 / 180.0) * 3.1416
 		);
 		break;
 
-	case GLUT_KEY_UP:
-		movimentar(
+	case 's':
+		movimentar_xz(
 			cubo,
 			10,
 			(90 / 180.0) * 3.1416
 		);
 		break;
 
-	case GLUT_KEY_RIGHT:
-		movimentar(
+	case 'd':
+		movimentar_xz(
 			cubo,
 			10,
 			(0 / 180.0) * 3.1416
 		);
 		break;
 
-	case GLUT_KEY_LEFT:
-		movimentar(
+	case 'a':
+		movimentar_xz(
 			cubo,
 			10,
 			(180 / 180.0) * 3.1416
@@ -178,8 +188,31 @@ void keyboard_special(int key, int x, int y) {
 	}
 }
 
+void keyboard_special(int key, int x, int y) {
+	switch (key) {
+
+	case GLUT_KEY_DOWN:
+		movimentar_xy(
+			cubo,
+			10,
+			(270 / 180.0) * 3.1416
+		);
+		break;
+
+	case GLUT_KEY_UP:
+		movimentar_xy(
+			cubo,
+			10,
+			(90 / 180.0) * 3.1416
+		);
+		break;
+	}
+}
+
 void redraw(int value) {
-	rotacionar(cubo, velocidadeRotacao);
+	rotacionar_x(cubo, velocidadeRotacao);
+	rotacionar_y(cubo, velocidadeRotacao);
+	rotacionar_z(cubo, velocidadeRotacao);
 
 	glutPostRedisplay();
 	glutTimerFunc(delay, redraw, 0);
@@ -190,7 +223,7 @@ Poligono criar_poligono(
 	double posicao_y,
 	double posicao_z,
 	double tamanho_lado,
-	int num_lados
+	int    num_lados
 ) {
 	Poligono novo_poligono;
 
@@ -206,7 +239,9 @@ Poligono criar_poligono(
 	novo_poligono.escala.y = 1;
 	novo_poligono.escala.z = 1;
 
-	novo_poligono.rotacao = 0;
+	novo_poligono.rotacao.x = 0;
+	novo_poligono.rotacao.y = 0;
+	novo_poligono.rotacao.z = 0;
 
 	float angulo = 0;
 
@@ -276,7 +311,7 @@ Poligono criar_poligono(
 	return novo_poligono;
 }
 
-void movimentar(
+void movimentar_xy(
 	Poligono& poligono,
 	double distancia,
 	double angulo
@@ -301,13 +336,41 @@ void movimentar(
 	}
 }
 
+void movimentar_xz(
+	Poligono& poligono,
+	double distancia,
+	double angulo
+) {
+	poligono.posicao.x =
+		poligono.posicao.x +
+		distancia * cos(angulo);
+
+	poligono.posicao.z =
+		poligono.posicao.z +
+		distancia * sin(angulo);
+
+	for (int i = 0; i < poligono.vertices.size(); i++) {
+
+		poligono.vertices[i].x =
+			poligono.vertices[i].x +
+			distancia * cos(angulo);
+
+		poligono.vertices[i].z =
+			poligono.vertices[i].z +
+			distancia * sin(angulo);
+	}
+}
+
 void escalar(
 	Poligono& poligono,
 	double escala_x,
-	double escala_y
+	double escala_y,
+	double escala_z
 ) {
 	poligono.escala.x *= escala_x;
 	poligono.escala.y *= escala_y;
+	poligono.escala.z *= escala_z;
+	double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
 
 	for (int i = 0; i < poligono.vertices.size(); i++) {
 
@@ -318,9 +381,13 @@ void escalar(
 		poligono.vertices[i].y -=
 			poligono.posicao.y;
 
+		poligono.vertices[i].z -=
+			centro_z;
+
 		// Aplica escala
 		poligono.vertices[i].x *= escala_x;
 		poligono.vertices[i].y *= escala_y;
+		poligono.vertices[i].z *= escala_z;
 
 		// Volta para a posição original
 		poligono.vertices[i].x +=
@@ -328,43 +395,128 @@ void escalar(
 
 		poligono.vertices[i].y +=
 			poligono.posicao.y;
+
+		poligono.vertices[i].z +=
+			centro_z;
 	}
 }
 
-void rotacionar(
+void rotacionar_x(
 	Poligono& poligono,
 	double angulo
 ) {
-	poligono.rotacao += angulo;
+	if(rotacionando_x){
+		poligono.rotacao.x += angulo;
+		double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
 
-	for (int i = 0;
-		 i < poligono.vertices.size();
-		 i++) {
+		for (int i = 0;
+			i < poligono.vertices.size();
+			i++) {
 
-		// Translada o vértice para a origem
-		poligono.vertices[i].x -=
-			poligono.posicao.x;
+			// Translada o vértice para a origem
+			poligono.vertices[i].y -=
+				poligono.posicao.y;
 
-		poligono.vertices[i].y -=
-			poligono.posicao.y;
+			poligono.vertices[i].z -=
+				centro_z;
 
-		double novoX =
-			poligono.vertices[i].x * cos(angulo) -
-			poligono.vertices[i].y * sin(angulo);
+			double novoY =
+				poligono.vertices[i].y * cos(angulo) -
+				poligono.vertices[i].z * sin(angulo);
 
-		double novoY =
-			poligono.vertices[i].x * sin(angulo) +
-			poligono.vertices[i].y * cos(angulo);
+			double novoZ =
+				poligono.vertices[i].y * sin(angulo) +
+				poligono.vertices[i].z * cos(angulo);
 
-		poligono.vertices[i].x = novoX;
-		poligono.vertices[i].y = novoY;
+			poligono.vertices[i].y = novoY;
+			poligono.vertices[i].z = novoZ;
 
-		// Volta para a posição original
-		poligono.vertices[i].x +=
-			poligono.posicao.x;
+			// Volta para a posição original
+			poligono.vertices[i].y +=
+				poligono.posicao.y;
 
-		poligono.vertices[i].y +=
-			poligono.posicao.y;
+			poligono.vertices[i].z +=
+				centro_z; 
+		}
+	}
+}
+
+void rotacionar_y(
+	Poligono& poligono,
+	double angulo
+) {
+	if(rotacionando_y){
+		poligono.rotacao.y += angulo;
+		double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
+
+		for (int i = 0;
+			i < poligono.vertices.size();
+			i++) {
+
+			// Translada o vértice para a origem
+			poligono.vertices[i].z -=
+				centro_z;
+
+			poligono.vertices[i].x -=
+				poligono.posicao.x;
+
+			double novoZ =
+				poligono.vertices[i].z * cos(angulo) -
+				poligono.vertices[i].x * sin(angulo);
+
+			double novoX =
+				poligono.vertices[i].z * sin(angulo) +
+				poligono.vertices[i].x * cos(angulo);
+
+			poligono.vertices[i].z = novoZ;
+			poligono.vertices[i].x = novoX;
+
+			// Volta para a posição original
+			poligono.vertices[i].z +=
+				centro_z; 
+
+			poligono.vertices[i].x+=
+				poligono.posicao.x;
+		}
+	}
+}
+
+void rotacionar_z(
+	Poligono& poligono,
+	double angulo
+) {
+	if(rotacionando_z){
+		poligono.rotacao.z += angulo;
+
+		for (int i = 0;
+			i < poligono.vertices.size();
+			i++) {
+
+			// Translada o vértice para a origem
+			poligono.vertices[i].x -=
+				poligono.posicao.x;
+
+			poligono.vertices[i].y -=
+				poligono.posicao.y;
+
+			double novoX =
+				poligono.vertices[i].x * cos(angulo) -
+				poligono.vertices[i].y * sin(angulo);
+
+			double novoY =
+				poligono.vertices[i].x * sin(angulo) +
+				poligono.vertices[i].y * cos(angulo);
+
+			poligono.vertices[i].x = novoX;
+			poligono.vertices[i].y = novoY;
+
+			// Volta para a posição original
+			poligono.vertices[i].x +=
+				poligono.posicao.x;
+
+			poligono.vertices[i].y +=
+				poligono.posicao.y;
+		}
 	}
 }
 
