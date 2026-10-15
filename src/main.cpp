@@ -4,6 +4,7 @@
 #include <iostream>
 #include <memory>
 #include <stdexcept>
+#include <string>
 #include <GL/freeglut.h>
 
 namespace {
@@ -188,8 +189,17 @@ void movimentoMouse(int x, int y) {
 int main(int argc, char** argv) {
     try {
         if (argc > 1) {
-            objeto = std::make_unique<Objeto3D>(std::string(argv[1]));
-            std::cout << "Modelo carregado: " << argv[1] << '\n';
+            const std::string argumento = argv[1];
+            if (argumento == "cubo") {
+                objeto = std::make_unique<Objeto3D>(TipoGeometria::Cubo);
+                std::cout << "Usando cubo primitivo.\n";
+            } else if (argumento == "piramide") {
+                objeto = std::make_unique<Objeto3D>(TipoGeometria::Piramide);
+                std::cout << "Usando piramide primitiva.\n";
+            } else {
+                objeto = std::make_unique<Objeto3D>(argumento);
+                std::cout << "Modelo carregado: " << argumento << '\n';
+            }
         } else {
             objeto = std::make_unique<Objeto3D>(TipoGeometria::Cubo);
             std::cout << "Nenhum OBJ informado. Usando cubo primitivo.\n";
