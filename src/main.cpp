@@ -36,9 +36,20 @@ void configurarIluminacao() {
         {-3.0f,  2.0f,  1.0f, 1.0f},
         { 0.0f, -2.0f, -3.0f, 1.0f}
     };
-    const GLfloat ambiente[] = {0.15f, 0.15f, 0.15f, 1.0f};
-    const GLfloat difusa[] = {0.85f, 0.85f, 0.85f, 1.0f};
+    // Ambientes baixos deixam a diferença entre as luzes mais perceptível.
+    const GLfloat ambientes[][4] = {
+        {0.02f, 0.00f, 0.00f, 1.0f},
+        {0.00f, 0.02f, 0.00f, 1.0f},
+        {0.00f, 0.00f, 0.02f, 1.0f}
+    };
+    // Cada luz tem uma cor predominante diferente para facilitar o teste.
+    const GLfloat difusas[][4] = {
+        {1.0f, 0.10f, 0.10f, 1.0f},
+        {0.10f, 1.0f, 0.10f, 1.0f},
+        {0.10f, 0.10f, 1.0f, 1.0f}
+    };
     const GLfloat especular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+    const GLfloat materialEspecular[] = {1.0f, 1.0f, 1.0f, 1.0f};
 
     glEnable(GL_LIGHTING);
     glEnable(GL_COLOR_MATERIAL);
@@ -46,11 +57,14 @@ void configurarIluminacao() {
 
     for (int i = 0; i < 3; ++i) {
         glLightfv(luzes[i], GL_POSITION, posicoes[i]);
-        glLightfv(luzes[i], GL_AMBIENT, ambiente);
-        glLightfv(luzes[i], GL_DIFFUSE, difusa);
+        glLightfv(luzes[i], GL_AMBIENT, ambientes[i]);
+        glLightfv(luzes[i], GL_DIFFUSE, difusas[i]);
         glLightfv(luzes[i], GL_SPECULAR, especular);
         glEnable(luzes[i]);
     }
+
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialEspecular);
+    glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 64.0f);
 }
 
 void alternarLuz(int indice) {
@@ -90,7 +104,8 @@ void desenharCena() {
     configurarCamera();
 
     // A cor é definida antes do objeto porque afeta os vértices seguintes.
-    glColor3f(0.05f, 0.05f, 0.05f);
+    // Branco permite que a cor de cada luz seja percebida no objeto.
+    glColor3f(1.0f, 1.0f, 1.0f);
     objeto->desenhar();
 
     glutSwapBuffers();
@@ -303,7 +318,7 @@ int main(int argc, char** argv) {
     glutCreateWindow("M1 - Transformacoes 3D");
 
     // Configurações iniciais do estado OpenGL.
-    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClearColor(0.06f, 0.06f, 0.06f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     // Reescala as normais automaticamente quando o objeto é escalado.
     glEnable(GL_NORMALIZE);
