@@ -26,6 +26,7 @@ int mouseX = 0; // Última posição horizontal conhecida do mouse.
 int mouseY = 0; // Última posição vertical conhecida do mouse.
 bool arrastandoRotacao = false; // Botão esquerdo está pressionado.
 bool arrastandoTranslacao = false; // Botão direito está pressionado.
+bool luzAtiva[3] = {true, true, true}; // Estado persistente das três luzes.
 
 void configurarIluminacao() {
     // Cada luz possui posição e as três componentes exigidas no trabalho:
@@ -60,7 +61,12 @@ void configurarIluminacao() {
         glLightfv(luzes[i], GL_AMBIENT, ambientes[i]);
         glLightfv(luzes[i], GL_DIFFUSE, difusas[i]);
         glLightfv(luzes[i], GL_SPECULAR, especular);
-        glEnable(luzes[i]);
+        // Não habilita sempre: respeita o estado escolhido pelo usuário.
+        if (luzAtiva[i]) {
+            glEnable(luzes[i]);
+        } else {
+            glDisable(luzes[i]);
+        }
     }
 
     glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, materialEspecular);
@@ -69,7 +75,9 @@ void configurarIluminacao() {
 
 void alternarLuz(int indice) {
     const GLenum luz = GL_LIGHT0 + indice;
-    if (glIsEnabled(luz)) {
+    luzAtiva[indice] = !luzAtiva[indice];
+
+    if (!luzAtiva[indice]) {
         glDisable(luz);
     } else {
         glEnable(luz);
