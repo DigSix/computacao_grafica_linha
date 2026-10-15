@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
 struct Vetor3 {
@@ -14,9 +15,15 @@ struct Transformacao {
     Vetor3 escala{1.0f, 1.0f, 1.0f};
 };
 
+enum class TipoGeometria {
+    Cubo,
+    Piramide
+};
+
 class Objeto3D {
 public:
-    explicit Objeto3D(float tamanho);
+    explicit Objeto3D(TipoGeometria tipo, float tamanho = 2.0f);
+    explicit Objeto3D(const std::string& caminhoObj, float tamanho = 2.0f);
 
     void desenhar() const;
 
@@ -34,4 +41,9 @@ private:
     std::vector<Vetor3> vertices;
     std::vector<Aresta> arestas;
     Transformacao transformacao;
+
+    void criarCubo(float tamanho);
+    void criarPiramide(float tamanho);
+    void carregarObj(const std::string& caminhoObj, float tamanho);
+    void normalizar(float tamanho);
 };
