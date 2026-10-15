@@ -1,550 +1,204 @@
-#include <iostream>
-#include <cmath>
+#include "Objeto3D.hpp"
+
+#include <cstdlib>
 #include <GL/freeglut.h>
-#include <vector>
 
-struct Vec3{
-	double x;
-	double y;
-	double z;
-};
+namespace {
 
-using vertice =        Vec3;
-using lista_vertices = std::vector<vertice>;
-using aresta =         std::pair<int, int>;
-using lista_arestas =  std::vector<aresta>;
+constexpr int larguraInicial = 800;
+constexpr int alturaInicial = 600;
+constexpr float passoTranslacao = 0.1f;
+constexpr float passoRotacao = 5.0f;
+constexpr float passoEscala = 1.1f;
 
-struct Poligono {
-	double tamanhoLado;
-	int	   numLados;
+Objeto3D cubo(2.0f);
+int larguraJanela = larguraInicial;
+int alturaJanela = alturaInicial;
+int mouseX = 0;
+int mouseY = 0;
+bool arrastandoRotacao = false;
+bool arrastandoTranslacao = false;
 
-	Vec3 posicao;
-	Vec3 escala;
-	Vec3 rotacao;
-
-	lista_vertices vertices;
-	lista_arestas  arestas;
-};
-
-Poligono criar_poligono(
-	double posicao_x,
-	double posicao_y,
-	double posicao_z,
-	double tamanho_lado,
-	int    num_lados
-);
-
-void desenhar(Poligono poligono);
-void movimentar_xy(Poligono& poligono, double distancia, double angulo);
-void movimentar_xz(Poligono& poligono, double distancia, double angulo);
-void escalar(Poligono& poligono, double escala_x, double escala_y, double escala_z);
-void rotacionar_x(Poligono& poligono, double angulo);
-void rotacionar_y(Poligono& poligono, double angulo);
-void rotacionar_z(Poligono& poligono, double angulo);
-
-// Implementação da tangente
-double tangente(double angulo);
-
-void display();
-void redraw(int value);
-void keyboard(unsigned char key, int x, int y);
-void keyboard_special(int key, int x, int y);
-
-Poligono cubo;
-float    velocidadeRotacao = 0;
-bool     rotacionando_x = false;
-bool     rotacionando_y = false;
-bool     rotacionando_z = false;
-int      delay = 10;
-
-int main(int argc, char** argv) {
-
-	cubo = criar_poligono(128, 128, 128, 100, 4);
-
-	glutInit(&argc, argv);
-
-	glutInitWindowSize(512, 512);
-
-	glutCreateWindow("Desenhando um Polígono");
-
-	glClearColor(1, 1, 1, 0);
-
-	glEnable(GL_DEPTH_TEST);
-
-	glutDisplayFunc(display);
-	glutKeyboardFunc(keyboard);
-	glutSpecialFunc(keyboard_special);
-	glutTimerFunc(10, redraw, 0);
-
-	glutMainLoop();
-
-	return 0;
-}
-
-double tangente(double angulo) {
-	return sin(angulo) / cos(angulo);
-}
-
-void configurar_camera() {
+void configurarCamera() {
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    gluPerspective(
-        60.0,    // campo de visão
-        512.0 / 512.0, // aspect ratio
-        0.1,     // plano próximo
-        1000.0   // plano distante
-    );
+    const double aspecto = static_cast<double>(larguraJanela) /
+                           static_cast<double>(alturaJanela);
+    gluPerspective(60.0, aspecto, 0.1, 100.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    // Câmera olhando para o centro do cubo
-    gluLookAt(
-        300, 300, 300,   // posição da câmera
-        128, 128, 103,   // ponto para onde olha
-        0, 1, 0          // "cima"
-    );
+    gluLookAt(4.0, 3.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 }
 
-void display(void) {
-
+void desenharCena() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    configurarCamera();
 
-    configurar_camera();
+    glColor3f(0.05f, 0.05f, 0.05f);
+    cubo.desenhar();
 
-    desenhar(cubo);
-
-    glFlush();
+    glutSwapBuffers();
 }
 
-void keyboard(unsigned char key, int x, int y) {
-	switch (key) {
-
-	case 27:
-		exit(0);
-		break;
-
-	case 'o':
-		escalar(cubo, 0.9, 0.9, 0.9);
-		break;
-
-	case 'p':
-		escalar(cubo, 1.1, 1.1, 1.1);
-		break;
-
-	case 'k':
-		velocidadeRotacao -= 0.01;
-		break;
-
-	case 'l':
-		velocidadeRotacao += 0.01;
-		break;
-
-
-	case 'x':
-		rotacionando_x = !rotacionando_x;
-		break;
-
-	case 'y':
-		rotacionando_y = !rotacionando_y;
-		break;
-
-	case 'z':
-		rotacionando_z = !rotacionando_z;
-		break;
-
-	case 'w':
-		movimentar_xz(
-			cubo,
-			10,
-			(270 / 180.0) * 3.1416
-		);
-		break;
-
-	case 's':
-		movimentar_xz(
-			cubo,
-			10,
-			(90 / 180.0) * 3.1416
-		);
-		break;
-
-	case 'd':
-		movimentar_xz(
-			cubo,
-			10,
-			(0 / 180.0) * 3.1416
-		);
-		break;
-
-	case 'a':
-		movimentar_xz(
-			cubo,
-			10,
-			(180 / 180.0) * 3.1416
-		);
-		break;
-	}
+void redimensionar(int largura, int altura) {
+    larguraJanela = largura;
+    alturaJanela = altura > 0 ? altura : 1;
+    glViewport(0, 0, larguraJanela, alturaJanela);
+    glutPostRedisplay();
 }
 
-void keyboard_special(int key, int x, int y) {
-	switch (key) {
+void teclado(unsigned char tecla, int, int) {
+    switch (tecla) {
+    case 27:
+        std::exit(EXIT_SUCCESS);
+    case 'w':
+        cubo.transladar(0.0f, passoTranslacao, 0.0f);
+        break;
+    case 's':
+        cubo.transladar(0.0f, -passoTranslacao, 0.0f);
+        break;
+    case 'a':
+        cubo.transladar(-passoTranslacao, 0.0f, 0.0f);
+        break;
+    case 'd':
+        cubo.transladar(passoTranslacao, 0.0f, 0.0f);
+        break;
+    case 'q':
+        cubo.transladar(0.0f, 0.0f, passoTranslacao);
+        break;
+    case 'e':
+        cubo.transladar(0.0f, 0.0f, -passoTranslacao);
+        break;
+    case 'i':
+        cubo.rotacionar(passoRotacao, 0.0f, 0.0f);
+        break;
+    case 'k':
+        cubo.rotacionar(-passoRotacao, 0.0f, 0.0f);
+        break;
+    case 'j':
+        cubo.rotacionar(0.0f, -passoRotacao, 0.0f);
+        break;
+    case 'l':
+        cubo.rotacionar(0.0f, passoRotacao, 0.0f);
+        break;
+    case 'u':
+        cubo.rotacionar(0.0f, 0.0f, passoRotacao);
+        break;
+    case 'o':
+        cubo.rotacionar(0.0f, 0.0f, -passoRotacao);
+        break;
+    case '+':
+    case '=':
+        cubo.escalar(passoEscala);
+        break;
+    case '-':
+    case '_':
+        cubo.escalar(1.0f / passoEscala);
+        break;
+    case 'r':
+    case 'R':
+        cubo.resetarTransformacao();
+        break;
+    default:
+        return;
+    }
 
-	case GLUT_KEY_DOWN:
-		movimentar_xy(
-			cubo,
-			10,
-			(270 / 180.0) * 3.1416
-		);
-		break;
-
-	case GLUT_KEY_UP:
-		movimentar_xy(
-			cubo,
-			10,
-			(90 / 180.0) * 3.1416
-		);
-		break;
-	}
+    glutPostRedisplay();
 }
 
-void redraw(int value) {
-	rotacionar_x(cubo, velocidadeRotacao);
-	rotacionar_y(cubo, velocidadeRotacao);
-	rotacionar_z(cubo, velocidadeRotacao);
+void teclasEspeciais(int tecla, int, int) {
+    switch (tecla) {
+    case GLUT_KEY_UP:
+        cubo.transladar(0.0f, passoTranslacao, 0.0f);
+        break;
+    case GLUT_KEY_DOWN:
+        cubo.transladar(0.0f, -passoTranslacao, 0.0f);
+        break;
+    case GLUT_KEY_LEFT:
+        cubo.transladar(-passoTranslacao, 0.0f, 0.0f);
+        break;
+    case GLUT_KEY_RIGHT:
+        cubo.transladar(passoTranslacao, 0.0f, 0.0f);
+        break;
+    case GLUT_KEY_PAGE_UP:
+        cubo.transladar(0.0f, 0.0f, -passoTranslacao);
+        break;
+    case GLUT_KEY_PAGE_DOWN:
+        cubo.transladar(0.0f, 0.0f, passoTranslacao);
+        break;
+    default:
+        return;
+    }
 
-	glutPostRedisplay();
-	glutTimerFunc(delay, redraw, 0);
+    glutPostRedisplay();
 }
 
-Poligono criar_poligono(
-	double posicao_x,
-	double posicao_y,
-	double posicao_z,
-	double tamanho_lado,
-	int    num_lados
-) {
-	Poligono novo_poligono;
+void mouse(int botao, int estado, int x, int y) {
+    if (estado == GLUT_DOWN) {
+        mouseX = x;
+        mouseY = y;
+        arrastandoRotacao = botao == GLUT_LEFT_BUTTON;
+        arrastandoTranslacao = botao == GLUT_RIGHT_BUTTON;
 
-	novo_poligono.numLados = num_lados;
+        if (botao == 3) {
+            cubo.escalar(passoEscala);
+        } else if (botao == 4) {
+            cubo.escalar(1.0f / passoEscala);
+        }
+    } else {
+        arrastandoRotacao = false;
+        arrastandoTranslacao = false;
+    }
 
-	novo_poligono.posicao.x = posicao_x;
-	novo_poligono.posicao.y = posicao_y;
-	novo_poligono.posicao.z = posicao_z;
-
-	novo_poligono.tamanhoLado = tamanho_lado;
-
-	novo_poligono.escala.x = 1;
-	novo_poligono.escala.y = 1;
-	novo_poligono.escala.z = 1;
-
-	novo_poligono.rotacao.x = 0;
-	novo_poligono.rotacao.y = 0;
-	novo_poligono.rotacao.z = 0;
-
-	float angulo = 0;
-
-	float passo_angulo =
-		((360 / float(num_lados)) * 3.1415926536) / 180.0;
-
-	// Apótema:
-	// a = lado / (2 * tan(pi / n))
-	float apothem =
-		tamanho_lado /
-		(2 * tangente(3.1416 / float(num_lados)));
-
-	posicao_x -= tamanho_lado / 2.0;
-	posicao_y -= apothem;
-
-	novo_poligono.vertices.push_back(
-			vertice(posicao_x, posicao_y, posicao_z)
-		);
-	novo_poligono.vertices.push_back(
-			vertice(posicao_x, posicao_y, posicao_z - tamanho_lado)
-	);
-
-	// Vertices
-
-	for (int i = 1; i < num_lados; i++) {
-
-		posicao_x =
-			posicao_x +
-			tamanho_lado * cos(angulo);
-
-		posicao_y =
-			posicao_y +
-			tamanho_lado * sin(angulo);
-
-		novo_poligono.vertices.push_back(
-			vertice(posicao_x, posicao_y, posicao_z)
-		);
-		novo_poligono.vertices.push_back(
-			vertice(posicao_x, posicao_y, posicao_z - tamanho_lado)
-		);
-
-		angulo += passo_angulo;
-	}
-
-	// Arestas
-
-	for (int i = 0; i < num_lados; i++) {
-		int atual = i * 2;
-		int proximo = ((i + 1) % num_lados) * 2;
-
-		// Aresta da frente
-		novo_poligono.arestas.push_back(
-			aresta(atual, proximo)
-		);
-
-		// Aresta de trás
-		novo_poligono.arestas.push_back(
-			aresta(atual + 1, proximo + 1)
-		);
-
-		// Aresta lateral
-		novo_poligono.arestas.push_back(
-			aresta(atual, atual + 1)
-		);
-	}
-
-	return novo_poligono;
+    glutPostRedisplay();
 }
 
-void movimentar_xy(
-	Poligono& poligono,
-	double distancia,
-	double angulo
-) {
-	poligono.posicao.x =
-		poligono.posicao.x +
-		distancia * cos(angulo);
+void movimentoMouse(int x, int y) {
+    const int deltaX = x - mouseX;
+    const int deltaY = y - mouseY;
+    mouseX = x;
+    mouseY = y;
 
-	poligono.posicao.y =
-		poligono.posicao.y +
-		distancia * sin(angulo);
+    if (arrastandoRotacao) {
+        cubo.rotacionar(
+            static_cast<float>(deltaY) * 0.5f,
+            static_cast<float>(deltaX) * 0.5f,
+            0.0f
+        );
+    } else if (arrastandoTranslacao) {
+        cubo.transladar(
+            static_cast<float>(deltaX) * 0.01f,
+            static_cast<float>(-deltaY) * 0.01f,
+            0.0f
+        );
+    } else {
+        return;
+    }
 
-	for (int i = 0; i < poligono.vertices.size(); i++) {
-
-		poligono.vertices[i].x =
-			poligono.vertices[i].x +
-			distancia * cos(angulo);
-
-		poligono.vertices[i].y =
-			poligono.vertices[i].y +
-			distancia * sin(angulo);
-	}
+    glutPostRedisplay();
 }
 
-void movimentar_xz(
-	Poligono& poligono,
-	double distancia,
-	double angulo
-) {
-	poligono.posicao.x =
-		poligono.posicao.x +
-		distancia * cos(angulo);
+} // namespace
 
-	poligono.posicao.z =
-		poligono.posicao.z +
-		distancia * sin(angulo);
+int main(int argc, char** argv) {
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(larguraInicial, alturaInicial);
+    glutCreateWindow("M1 - Transformacoes 3D");
 
-	for (int i = 0; i < poligono.vertices.size(); i++) {
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
+    glLineWidth(2.0f);
 
-		poligono.vertices[i].x =
-			poligono.vertices[i].x +
-			distancia * cos(angulo);
+    glutDisplayFunc(desenharCena);
+    glutReshapeFunc(redimensionar);
+    glutKeyboardFunc(teclado);
+    glutSpecialFunc(teclasEspeciais);
+    glutMouseFunc(mouse);
+    glutMotionFunc(movimentoMouse);
 
-		poligono.vertices[i].z =
-			poligono.vertices[i].z +
-			distancia * sin(angulo);
-	}
-}
-
-void escalar(
-	Poligono& poligono,
-	double escala_x,
-	double escala_y,
-	double escala_z
-) {
-	poligono.escala.x *= escala_x;
-	poligono.escala.y *= escala_y;
-	poligono.escala.z *= escala_z;
-	double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
-
-	for (int i = 0; i < poligono.vertices.size(); i++) {
-
-		// Translada para a origem
-		poligono.vertices[i].x -=
-			poligono.posicao.x;
-
-		poligono.vertices[i].y -=
-			poligono.posicao.y;
-
-		poligono.vertices[i].z -=
-			centro_z;
-
-		// Aplica escala
-		poligono.vertices[i].x *= escala_x;
-		poligono.vertices[i].y *= escala_y;
-		poligono.vertices[i].z *= escala_z;
-
-		// Volta para a posição original
-		poligono.vertices[i].x +=
-			poligono.posicao.x;
-
-		poligono.vertices[i].y +=
-			poligono.posicao.y;
-
-		poligono.vertices[i].z +=
-			centro_z;
-	}
-}
-
-void rotacionar_x(
-	Poligono& poligono,
-	double angulo
-) {
-	if(rotacionando_x){
-		poligono.rotacao.x += angulo;
-		double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
-
-		for (int i = 0;
-			i < poligono.vertices.size();
-			i++) {
-
-			// Translada o vértice para a origem
-			poligono.vertices[i].y -=
-				poligono.posicao.y;
-
-			poligono.vertices[i].z -=
-				centro_z;
-
-			double novoY =
-				poligono.vertices[i].y * cos(angulo) -
-				poligono.vertices[i].z * sin(angulo);
-
-			double novoZ =
-				poligono.vertices[i].y * sin(angulo) +
-				poligono.vertices[i].z * cos(angulo);
-
-			poligono.vertices[i].y = novoY;
-			poligono.vertices[i].z = novoZ;
-
-			// Volta para a posição original
-			poligono.vertices[i].y +=
-				poligono.posicao.y;
-
-			poligono.vertices[i].z +=
-				centro_z; 
-		}
-	}
-}
-
-void rotacionar_y(
-	Poligono& poligono,
-	double angulo
-) {
-	if(rotacionando_y){
-		poligono.rotacao.y += angulo;
-		double centro_z = poligono.posicao.z - poligono.tamanhoLado / 2.0;
-
-		for (int i = 0;
-			i < poligono.vertices.size();
-			i++) {
-
-			// Translada o vértice para a origem
-			poligono.vertices[i].z -=
-				centro_z;
-
-			poligono.vertices[i].x -=
-				poligono.posicao.x;
-
-			double novoZ =
-				poligono.vertices[i].z * cos(angulo) -
-				poligono.vertices[i].x * sin(angulo);
-
-			double novoX =
-				poligono.vertices[i].z * sin(angulo) +
-				poligono.vertices[i].x * cos(angulo);
-
-			poligono.vertices[i].z = novoZ;
-			poligono.vertices[i].x = novoX;
-
-			// Volta para a posição original
-			poligono.vertices[i].z +=
-				centro_z; 
-
-			poligono.vertices[i].x+=
-				poligono.posicao.x;
-		}
-	}
-}
-
-void rotacionar_z(
-	Poligono& poligono,
-	double angulo
-) {
-	if(rotacionando_z){
-		poligono.rotacao.z += angulo;
-
-		for (int i = 0;
-			i < poligono.vertices.size();
-			i++) {
-
-			// Translada o vértice para a origem
-			poligono.vertices[i].x -=
-				poligono.posicao.x;
-
-			poligono.vertices[i].y -=
-				poligono.posicao.y;
-
-			double novoX =
-				poligono.vertices[i].x * cos(angulo) -
-				poligono.vertices[i].y * sin(angulo);
-
-			double novoY =
-				poligono.vertices[i].x * sin(angulo) +
-				poligono.vertices[i].y * cos(angulo);
-
-			poligono.vertices[i].x = novoX;
-			poligono.vertices[i].y = novoY;
-
-			// Volta para a posição original
-			poligono.vertices[i].x +=
-				poligono.posicao.x;
-
-			poligono.vertices[i].y +=
-				poligono.posicao.y;
-		}
-	}
-}
-
-void desenhar(Poligono poligono) {
-
-	glColor3f(0, 0, 0);
-
-	glBegin(GL_LINES);
-
-	for (int i = 0;
-		 i < poligono.arestas.size();
-		 i++) {
-
-		int v_o = poligono.arestas[i].first;
-		int v_d = poligono.arestas[i].second;
-
-		glVertex3f(
-			poligono.vertices[v_o].x,
-			poligono.vertices[v_o].y,
-			poligono.vertices[v_o].z
-		);
-
-		glVertex3f(
-			poligono.vertices[v_d].x,
-			poligono.vertices[v_d].y,
-			poligono.vertices[v_d].z
-		);
-	}
-
-	glEnd();
+    glutMainLoop();
+    return 0;
 }

@@ -11,7 +11,10 @@ find_package(GLUT REQUIRED)
 
 add_executable(Linha
     src/main.cpp
+    src/Objeto3D.cpp
 )
+
+target_include_directories(Linha PRIVATE src)
 
 
 target_link_libraries(Linha
