@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 #include <vector>
 
 // Representa uma posição ou direção no espaço 3D.
@@ -48,18 +49,26 @@ public:
     void resetarTransformacao();
 
 private:
-    // Uma face OBJ é convertida em arestas para o desenho wireframe.
-    struct Aresta {
-        unsigned int inicio; // Índice do primeiro vértice.
-        unsigned int fim;    // Índice do segundo vértice.
+    struct VerticeFace {
+        unsigned int posicao;
+        int normal;
+    };
+
+    struct Face {
+        std::array<VerticeFace, 3> vertices;
+        Vetor3 normalCalculada;
     };
 
     std::vector<Vetor3> vertices;
-    std::vector<Aresta> arestas;
+    std::vector<Vetor3> normais;
+    std::vector<Face> faces;
     Transformacao transformacao;
 
     void criarCubo(float tamanho);
     void criarPiramide(float tamanho);
     void carregarObj(const std::string& caminhoObj, float tamanho);
     void normalizar(float tamanho);
+    void adicionarFace(unsigned int a, unsigned int b, unsigned int c,
+                       int normalA = -1, int normalB = -1, int normalC = -1);
+    Vetor3 calcularNormal(unsigned int a, unsigned int b, unsigned int c) const;
 };

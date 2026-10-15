@@ -27,6 +27,41 @@ int mouseY = 0; // Última posição vertical conhecida do mouse.
 bool arrastandoRotacao = false; // Botão esquerdo está pressionado.
 bool arrastandoTranslacao = false; // Botão direito está pressionado.
 
+void configurarIluminacao() {
+    // Cada luz possui posição e as três componentes exigidas no trabalho:
+    // ambiente, difusa e especular.
+    const GLenum luzes[] = {GL_LIGHT0, GL_LIGHT1, GL_LIGHT2};
+    const GLfloat posicoes[][4] = {
+        { 3.0f,  3.0f,  3.0f, 1.0f},
+        {-3.0f,  2.0f,  1.0f, 1.0f},
+        { 0.0f, -2.0f, -3.0f, 1.0f}
+    };
+    const GLfloat ambiente[] = {0.15f, 0.15f, 0.15f, 1.0f};
+    const GLfloat difusa[] = {0.85f, 0.85f, 0.85f, 1.0f};
+    const GLfloat especular[] = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    glEnable(GL_LIGHTING);
+    glEnable(GL_COLOR_MATERIAL);
+    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+
+    for (int i = 0; i < 3; ++i) {
+        glLightfv(luzes[i], GL_POSITION, posicoes[i]);
+        glLightfv(luzes[i], GL_AMBIENT, ambiente);
+        glLightfv(luzes[i], GL_DIFFUSE, difusa);
+        glLightfv(luzes[i], GL_SPECULAR, especular);
+        glEnable(luzes[i]);
+    }
+}
+
+void alternarLuz(int indice) {
+    const GLenum luz = GL_LIGHT0 + indice;
+    if (glIsEnabled(luz)) {
+        glDisable(luz);
+    } else {
+        glEnable(luz);
+    }
+}
+
 void configurarCamera() {
     // A matriz de projeção define como o mundo 3D será projetado na janela.
     glMatrixMode(GL_PROJECTION);
@@ -43,6 +78,10 @@ void configurarCamera() {
     glLoadIdentity();
     // Câmera em (4, 3, 5), olhando para a origem, com Y como direção vertical.
     gluLookAt(4.0, 3.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+
+    // A posição da luz é transformada pela matriz atual; por isso as luzes
+    // são configuradas depois da câmera em cada frame.
+    configurarIluminacao();
 }
 
 void desenharCena() {
@@ -123,6 +162,15 @@ void teclado(unsigned char tecla, int, int) {
     case 'R':
         // R volta o objeto ao estado inicial.
         objeto->resetarTransformacao();
+        break;
+    case '1':
+        alternarLuz(0);
+        break;
+    case '2':
+        alternarLuz(1);
+        break;
+    case '3':
+        alternarLuz(2);
         break;
     default:
         return;
@@ -257,6 +305,9 @@ int main(int argc, char** argv) {
     // Configurações iniciais do estado OpenGL.
     glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
+    // Reescala as normais automaticamente quando o objeto é escalado.
+    glEnable(GL_NORMALIZE);
+    glShadeModel(GL_SMOOTH);
     glLineWidth(2.0f);
 
     // Registro dos callbacks: o FreeGLUT chama essas funções quando os
